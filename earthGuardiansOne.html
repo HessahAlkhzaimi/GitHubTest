@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earth Guradians Game</title>
+    <style>
+        canvas {
+            margin-left: auto;
+            margin-right: auto;
+            display: black;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="gc" style="border: 1px solid black">
+
+        Please upgrade to html5 browser
+    </canvas>
+
+    <script>
+
+        //get canvas and context objects
+        var canvas = document.getElementById("gc");
+        var ctx = canvas.getContext("2d");
+
+        ctx.canvas.width = window.innerWidth - 3;
+        ctx.canvas.height = window.innerHeight - 2;
+
+        //Attributes for the background object 
+        var bg = new Image();
+        bg.src = "images/forest.jpg";
+        var bgWidth = canvas.width;
+        var bgHeight = canvas.height;
+        var bgX = 0;
+        var bgY = 0;
+
+        //Attrubites for the Boy
+        var boy = new Image();
+        boy.src = "images/boy.png";
+        var boyWidth = 200;
+        var boyHeight = 200;
+        var boyX = canvas.width / 2 - boyWidth / 2;
+        var boyY = canvas.height - boyHeight - 20;
+        var boySpeed = 10;
+
+        //Attributes for the bullet
+        var bullet = new Image();
+        bullet.src = "images/bullet.png"
+        var bulletWidth = 15;
+        var bulletHeight = 15;
+        var bulletX = boyX + boyWidth / 2 + 20;
+        var bulletY = boyY + 70;
+        var bulletSpeed = 14;
+        var bulletFired = false;
+
+
+        //Attrubites for the plane
+        var plane = new Image();
+        plane.src = "images/plane.png";
+        var planeWidth = 500;
+        var planeHeight = 90;
+        var planeX = -planeWidth;
+        var planeY = 0;
+        var planeSpeed = 5;
+
+        //Attrubites for the heart
+        var heart = new Image();
+        heart.src = "images/heart.png";
+        var heartWidth = 45;
+        var heartHeight = 45;
+        var heartX = 10;
+        var heartY = 10;
+        var spacing = 10;
+
+        //Attrubites for the plane 2
+        var plane2 = new Image();
+        plane2.src = "images/plane2.png";
+        var plane2X = canvas.width + planeWidth;
+        var plane2Y = 90;
+        var plane2Move = false;
+
+        //Attrubites for the plane 3
+        var plane3 = new Image();
+        plane3.src = "images/plane.png";
+        var plane3X = -planeWidth;
+        var plane3Y = 180;
+        var plane3Move = false;
+
+
+        //Attrubites for the plane 4
+        var plane4 = new Image();
+        plane4.src = "images/plane2.png";
+        var plane4X = canvas.width + planeWidth;
+        var plane4Y = 270;
+        var plane4Move = false;
+
+        //Attrubites for the object 1
+        var object = new Image();
+        object.src = "images/chainsaw.png";
+        var objectWidth = 60;
+        var objectHeight = 60;
+        var objectX = planeX + planeWidth / 2 - objectWidth / 2;
+        var objectY = 0;
+        var objectSpeed = planeSpeed;
+        var moveObjectWithPlane = true;
+        var objectStartedFalling = false;
+
+        //Attrubites for the object 2
+        var object2 = new Image();
+        object2.src = "images/glass.png";
+        var objectWidth2 = 60;
+        var objectHeight2 = 60;
+        var objectX2 = plane2X + planeWidth / 2 - objectWidth2 / 2; // This line initializes the X position
+        var objectY2 = 90; // This line initializes the Y position
+        var objectSpeed2 = planeSpeed; // This variable should be defined for object2 speed
+        var moveObjectWithPlane2 = true; // This flag controls movement with the plane
+        var object2StartedFalling = false; // This flag tracks whether it has started falling
+
+        //Attrubites for the object 3
+        var object3 = new Image();
+        object3.src = "images/chem.png";
+        var objectWidth3 = 80;
+        var objectHeight3 = 80;
+        var objectX3 = plane3X + planeWidth / 2 - objectWidth3 / 2; // This line initializes the X position
+        var objectY3 = 180; // This line initializes the Y position
+        var objectSpeed3 = planeSpeed; // This variable should be defined for object2 speed
+        var moveObjectWithPlane3 = true; // This flag controls movement with the plane
+        var object3StartedFalling = false; // This flag tracks whether it has started falling
+
+        //Attrubites for the object 3
+        var object4 = new Image();
+        object4.src = "images/cig.png";
+        var objectWidth4 = 60;
+        var objectHeight4 = 60;
+        var objectX4 = plane4X + planeWidth / 2 - objectWidth4 / 2; // This line initializes the X position
+        var objectY4 = 300; // This line initializes the Y position
+        var objectSpeed3 = planeSpeed; // This variable should be defined for object2 speed
+        var moveObjectWithPlane4 = true; // This flag controls movement with the plane
+        var object4StartedFalling = false; // This flag tracks whether it has started falling
+
+        // sounds
+        var gunshot1 = new Audio("sounds/gun1.mp3");
+        var gunshot2 = new Audio("sounds/gun2.mp3");
+        var sound1 = new Audio("sounds/knife.mp3");
+        var sound2 = new Audio("sounds/glass.mp3");
+        var sound3 = new Audio("sounds/glass.mp3");
+        var sound4 = new Audio("sounds/cig.mp3");
+        var bgSound = new Audio("sounds/bgSound.mp3");
+        var NextLevel = new Audio("sounds/nextLevel.mp3");
+        var WonGame = new Audio("sounds/wonGame.mp3");
+        var lose = new Audio("sounds/lose.mp3");
+
+        //keyboard attributes for boy 1
+        var leftPressed = false;
+        var rightPressed = false;
+
+
+        //game statistics
+        var hits = 0;
+        var misses = 1;
+        var level = 1;
+        var levelTime = 30;
+        var time = 0;
+        var seconds = 0;
+        var toBe = 2;
+        var lives = 5;
+
+        function drawStats() {
+            // Padding around the text
+            var padding = 10;
+            // Space between lines
+            var lineHeight = 24;
+            // X position for top right, with space for padding
+            var statsX = 1180;
+            // Y position for top right, with space for padding
+            var statsY = 100;
+
+            ctx.beginPath();
+            ctx.font = "14pt monospace";
+            ctx.fillStyle = "black";
+
+            // Define text lines
+            var stats = [
+                "Statistics",
+
+                "Level: " + level,
+                "Target: " + toBe,
+                "Misses left: " + misses,
+                "Level Hits: " + hits,
+                "Time: " + levelTime
+            ];
+
+            // Calculate box dimensions based on text length
+            var boxWidth = 200; // Set a fixed width for the stats box
+            var boxHeight = stats.length * lineHeight + padding * 2;
+
+            // Draw the background box
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)"; // Light background with transparency
+            ctx.fillRect(statsX, statsY, boxWidth, boxHeight);
+
+            // Draw a border around the box
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(statsX, statsY, boxWidth, boxHeight);
+
+            // Draw each stat line inside the box
+            ctx.fillStyle = "black";
+            stats.forEach(function (text, index) {
+                ctx.fillText(text, statsX + padding, statsY + padding + (index + 1) * lineHeight);
+            });
+        }
+
+
+        function drawScreen() {
+            //Clear the canvas using the background
+            ctx.drawImage(bg, bgX, bgY, bgWidth, bgHeight);
+            //Draw bullet
+            ctx.drawImage(bullet, bulletX, bulletY, bulletWidth, bulletHeight);
+            //Draw Boy
+            ctx.drawImage(boy, boyX, boyY, boyWidth, boyHeight);
+            //Draw Plane 1
+            ctx.drawImage(plane, planeX, planeY, planeWidth, planeHeight);
+            //Draw Plane 2
+            ctx.drawImage(plane2, plane2X, plane2Y, planeWidth, planeHeight);
+            //Draw Plane 3
+            ctx.drawImage(plane3, plane3X, plane3Y, planeWidth, planeHeight);
+            //Draw Plane 4
+            ctx.drawImage(plane4, plane4X, plane4Y, planeWidth, planeHeight);
+            //Draw object
+            ctx.drawImage(object, objectX, objectY, objectWidth, objectHeight);
+            //Draw object2
+            ctx.drawImage(object2, objectX2, objectY2, objectWidth2, objectHeight2);
+            //Draw object3
+            ctx.drawImage(object3, objectX3, objectY3, objectWidth3, objectHeight3);
+            //Draw object4
+            ctx.drawImage(object4, objectX4, objectY4, objectWidth4, objectHeight4);
+            //Draw heart
+            for (let i = 0; i < lives; i++) {
+                ctx.drawImage(heart, heartX + i * (heartWidth + spacing), heartY, heartWidth, heartHeight);
+            }
+
+            drawStats();
+        }
+
+        //get browser drawing object
+        var raf = window.requestAnimationFrame;
+
+        //set delay to 10 ms
+        var delay = 10;
+
+        //function for game loop
+        function animate() {
+            setTimeout(function () {
+                raf(animate);
+
+                //call draw screen
+                drawScreen();
+
+                //call the game logic funtion
+                handleGameLogic();
+            }, delay)
+        }
+        animate();
+
+
+        function handleGameLogic() {
+            //move the boy 1
+            moveBoy();
+            //move the plane
+            movePlane();
+            //move the bullet
+            moveBullet();
+            //move object
+            moveObject();
+            //move plane 2
+            movePlane2();
+            //move object 2
+            moveObject2();
+            //move plane 3
+            movePlane3();
+            //move object 3
+            moveObject3();
+            //move plane 4
+            movePlane4();
+            //move object 4
+            moveObject4()
+
+            //background music
+            bgSound.loop = true;
+            bgSound.play();
+            //loosing conditions
+            losingConditions();
+            //updating levels
+            updateLevel();
+
+            objectTouchBoy();
+
+
+        }
+
+
+        function moveObject() {
+            // Check if it's time for the object to start falling
+            if (seconds % 3 === 0 && seconds > 0 && !objectStartedFalling) {
+                if (planeX + planeWidth / 2 > 20 && planeX + planeWidth / 2 < canvas.width - 20) {
+                    objectStartedFalling = true;
+                    moveObjectWithPlane = false;
+                    // Center the object on the current position of the plane
+                    objectX = planeX + planeWidth / 2 - objectWidth / 2;
+                }
+            }
+
+
+            // Move the object down if it has started falling
+            if (objectStartedFalling) {
+                objectY += objectSpeed;
+
+                // Check if the object has gone off screen
+                if (objectY > canvas.height) {
+                    resetObject();
+                    misses--; // Reset the object when it goes off screen
+                }
+            }
+        }
+
+
+        function moveObject2() {
+            // Check if it's time for the object2 to start falling
+            if (seconds % 4 === 0 && seconds > 0 && !object2StartedFalling) {
+                if (plane2X + planeWidth / 2 > 20 && plane2X + planeWidth / 2 < canvas.width - 20) {
+                    object2StartedFalling = true;
+                    moveObjectWithPlane2 = false;
+                    // Center the object on the current position of plane2
+                    objectX2 = plane2X + planeWidth / 2 - objectWidth2 / 2;
+                }
+            }
+
+            // Move object2 down if it has started falling
+            if (object2StartedFalling) {
+                objectY2 += objectSpeed;
+
+                // Check if the object2 has gone off screen
+                if (objectY2 > canvas.height) {
+                    misses--;
+                    resetObject2();
+                }
+            }
+        }
+
+        function moveObject3() {
+            // Check if it's time for the object to start falling
+            if (seconds % 6 === 0 && seconds > 0 && !object3StartedFalling) {
+                if (plane3X + planeWidth / 2 > 20 && plane3X + planeWidth / 2 < canvas.width - 20) {
+                    object3StartedFalling = true;
+                    moveObjectWithPlane3 = false;
+                    // Center the object on the current position of the plane
+                    objectX3 = plane3X + planeWidth / 2 - objectWidth3 / 2;
+                }
+            }
+
+
+            // Move the object down if it has started falling
+            if (object3StartedFalling) {
+                objectY3 += objectSpeed3;
+
+                // Check if the object has gone off screen
+                if (objectY3 > canvas.height) {
+                    misses--;
+                    resetObject3(); // Reset the object when it goes off screen
+                }
+            }
+        }
+
+        function moveObject4() {
+            // Check if it's time for the object2 to start falling
+            if (seconds % 9 === 0 && seconds > 0 && !object4StartedFalling) {
+                if (plane4X + planeWidth / 2 > 20 && plane4X + planeWidth / 2 < canvas.width - 20) {
+                    object4StartedFalling = true;
+                    moveObjectWithPlane4 = false;
+                    // Center the object on the current position of plane2
+                    objectX4 = plane4X + planeWidth / 2 - objectWidth2 / 2;
+                }
+            }
+
+            // Move object2 down if it has started falling
+            if (object4StartedFalling) {
+                objectY4 += objectSpeed;
+
+                // Check if the object2 has gone off screen
+                if (objectY4 > canvas.height) {
+                    misses--;
+                    resetObject4();
+                }
+            }
+        }
+
+        function resetObject() {
+            objectY = 0; // Reset Y position to the top
+            objectStartedFalling = false; // Reset falling state
+            moveObjectWithPlane = true;
+            // Sync with plane’s X position when the plane returns
+            objectX = planeX + planeWidth / 2 - objectWidth / 2;
+        }
+
+        function resetObject2() {
+            objectY2 = 90; // Reset Y position
+            object2StartedFalling = false;
+            moveObjectWithPlane2 = true;
+            // Sync with plane2’s X position when the plane returns
+            objectX2 = plane2X + planeWidth / 2 - objectWidth2 / 2;
+        }
+
+
+        function resetObject3() {
+            objectY3 = 180;
+            object3StartedFalling = false; // Reset falling state
+            moveObjectWithPlane3 = true;
+            // Sync with plane’s X position when the plane returns
+            objectX3 = plane3X + planeWidth / 2 - objectWidth / 2;
+        }
+
+        function resetObject4() {
+            objectY4 = 300; // Reset Y position
+            object4StartedFalling = false;
+            moveObjectWithPlane4 = true;
+            // Sync with plane2’s X position when the plane returns
+            objectX4 = plane4X + planeWidth / 2 - objectWidth4 / 2;
+        }
+
+       
+
+        function movePlane() {
+            // Move the plane to the right
+            planeX += planeSpeed;
+            if (moveObjectWithPlane) {
+                objectX += objectSpeed;
+            }
+            // Bring back the plane to its original location if it's outside the screen
+            if (planeX >= (canvas.width + planeWidth)) {
+                planeX = -planeWidth; // Reset to start from left again
+            }
+        }
+
+        // Function to move Plane 2
+        function movePlane2() {
+            if (plane2Move) {
+                plane2X -= planeSpeed;
+                if (moveObjectWithPlane2) {
+                    objectX2 -= objectSpeed;
+                }
+                if (plane2X <= -planeWidth) {
+                    plane2X = canvas.width + planeWidth; // Reset to start from right
+                }
+            }
+        }
+
+        function movePlane3() {
+            if (plane3Move) {
+                // Move the plane to the right
+                plane3X += planeSpeed;
+                if (moveObjectWithPlane3) {
+                    objectX3 += objectSpeed;
+                }
+                // Bring back the plane to its original location if it's outside the screen
+                if (plane3X >= (canvas.width + planeWidth)) {
+                    plane3X = -planeWidth; // Reset to start from left again
+                }
+            }
+        }
+
+        function movePlane4() {
+            if (plane4Move) {
+                plane4X -= planeSpeed;
+                if (moveObjectWithPlane4) {
+                    objectX4 -= objectSpeed;
+                }
+
+                if (plane4X <= -planeWidth) {
+                    plane4X = canvas.width + planeWidth; // Reset to start from right
+                }
+            }
+        }
+
+        //for boy1
+        //function that returns true if the bullet hits the object
+        function bulletHitsObject() {
+            var hitX = bulletX >= objectX && bulletX <= objectX + objectWidth;
+            var hitY = bulletY >= objectY && bulletY <= objectY + objectHeight;
+
+            return hitX && hitY;
+        }
+
+        //function that returns true if the bullet hits the object2
+        function bulletHitsObject2() {
+            var hitX = bulletX >= objectX2 && bulletX <= objectX2 + objectWidth2;
+            var hitY = bulletY >= objectY2 && bulletY <= objectY2 + objectHeight2;
+
+            return hitX && hitY;
+        }
+
+        //function that returns true if the bullet hits the object3
+        function bulletHitsObject3() {
+            var hitX = bulletX >= objectX3 && bulletX <= objectX3 + objectWidth3;
+            var hitY = bulletY >= objectY3 && bulletY <= objectY3 + objectHeight3;
+
+            return hitX && hitY;
+        }
+
+        function bulletHitsObject4() {
+            var hitX = bulletX >= objectX4 && bulletX <= objectX4 + objectWidth4;
+            var hitY = bulletY >= objectY4 && bulletY <= objectY4 + objectHeight4;
+
+            return hitX && hitY;
+        }
+
+
+        function object1HitsBoy1() {
+            var hitobg1X = objectX >= boyX && objectX <= boyX + boyWidth;
+            var hitobg1y = objectY >= boyY;
+            return hitobg1X && hitobg1y
+
+        }
+
+        function object2HitsBoy1() {
+            var hitobg2X = objectX2 >= boyX && objectX2 <= boyX + boyWidth;
+            var hitobg2y = objectY2 >= boyY;
+            return hitobg2X && hitobg2y;
+
+        }
+        function object3HitsBoy1() {
+            var hitobg3X = objectX3 >= boyX && objectX3 <= boyX + boyWidth;
+            var hitobg3y = objectY3 >= boyY;
+            return hitobg3X && hitobg3y;
+
+        }
+        function object4HitsBoy1() {
+            var hitobg4X = objectX4 >= boyX && objectX4 <= boyX + boyWidth;
+            var hitobg4y = objectY4 >= boyY;
+            return hitobg4X && hitobg4y;
+
+        }
+
+
+
+        //function to move Boy
+        function moveBoy() {
+            if (leftPressed) {
+                if (boyX > -80) {
+                    boyX = boyX - boySpeed;
+                    bulletX = boyX + boyWidth / 2 + 20;
+                } 
+            }
+            if (rightPressed) {
+                if (boyX < canvas.width - 130) {
+                    boyX = boyX + boySpeed;
+                    bulletX = boyX + boyWidth / 2 + 20;
+                } 
+            }
+        }
+
+
+        function moveBullet() {
+            if (!bulletFired) {
+                resetBullet();
+            }
+            if (bulletFired) {
+                //move the bullet towards the top of the canvas
+                bulletY = bulletY - bulletSpeed;
+
+                //if the bullet goes outside the canavs, bring it back to the orginal location
+                if (bulletY <= -bulletHeight) {
+                    resetBullet();
+                }
+            }
+
+            if (bulletHitsObject()) {
+                hits++;
+                resetBullet();
+                resetObject();
+                sound1.play();
+            }
+
+            if (bulletHitsObject2()) {
+                hits++;
+                resetBullet();
+                resetObject2();
+                sound2.play();
+            }
+            if (bulletHitsObject3()) {
+                hits++;
+                resetBullet();
+                resetObject3();
+                sound3.play()
+            }
+            if (bulletHitsObject4()) {
+                hits++;
+                resetBullet();
+                resetObject4();
+                sound4.play()
+            }
+
+
+        }
+
+
+        function objectTouchBoy() {
+            if (object1HitsBoy1()) {
+                lives--;
+                resetObject();
+            }
+
+            if (object2HitsBoy1()) {
+                lives--;
+                resetObject2();
+            }
+
+            if (object3HitsBoy1()) {
+                lives--;
+                resetObject3();
+            }
+
+            if (object4HitsBoy1()) {
+                lives--;
+                resetObject4();
+            }
+        }
+
+
+
+
+        function resetBullet() {
+            bulletFired = false;
+            bulletX = boyX + boyWidth / 2 + 20;
+            bulletY = boyY + 70;
+        }
+
+
+        function updateLevel() {
+            if (level == 1 && levelTime > 0 && hits == 2) {
+                level = 2;
+                hits = 0;
+                misses = 2;
+                levelTime = 35;
+                toBe = 3;
+                plane2Move = true;
+                bg.src = "images/desert.jpg";
+                object.src = "images/bag.png";
+                sound1 = new Audio("sounds/bag.mp3");
+                NextLevel.play();
+            } else if (level == 2 && levelTime > 0 && hits == 3) {
+                level = 3;
+                hits = 0;
+                misses = 3;
+                levelTime = 40;
+                toBe = 4;
+                plane3Move = true;
+                bg.src = "images/ocean.jpg";
+                object.src = "images/oil.png";
+                object2.src = "images/bottle.png";
+                sound1 = new Audio("sounds/can.mp3");
+                sound2 = new Audio("sounds/bottle.mp3");
+                NextLevel.play();
+            } else if (level == 3 && levelTime > 0 && hits == 4) {
+                bg.src = "images/bg4.jpg";
+                level = 4;
+                hits = 0;
+                misses = 4;
+                levelTime = 45;
+                toBe = 5;
+                plane4Move = true;
+                object.src = "images/plasticBag.png";
+                object2.src = "images/bottle.png";
+                object3.src = "images/can.png";
+                sound1 = new Audio("sounds/bag.mp3");
+                sound3 = new Audio("sounds/can.mp3");
+                NextLevel.play();
+
+            }
+            else if (level == 4 && levelTime > 0 && hits == 5) {
+                WonGame.play();
+                alert("Congrats !!! You Saved our planet!");
+                window.location.href = "index.html";
+            }
+        }
+
+        function losingConditions() {
+
+            if (lives == 0) {
+                lose.play();
+                alert("Game Failed !!! ");
+                window.location.reload();
+      
+            }
+            if ((level == 1 && levelTime == 0 && hits < 2) || (level == 1 && misses == 0)) {
+                lose.play();
+                alert("You destroyed the EARTH :( Failed level 1 ...... repeat the level");
+                hits = 0;
+                misses = 1;
+                levelTime = 30;
+          
+
+
+            }
+            if ((level == 2 && levelTime == 0 && hits < 3) || (level == 2 && misses == 0)) {
+                lose.play();
+                alert("You destroyed the EARTH :( Failed level 2 ...... repeat the level");
+                hits = 0;
+                misses = 2;
+                levelTime = 35;
+   
+
+            }
+            if ((level == 3 && levelTime == 0 && hits < 4) || (level == 3 && misses == 0)) {
+                lose.play();
+                alert("You destroyed the EARTH :( Failed level 2 ...... repeat the level");
+                hits = 0;
+                misses = 4;
+                levelTime = 40;
+
+      
+
+            }
+            if ((level == 4 && levelTime == 0 && hits < 5) || (level == 4 && misses == 0)) {
+                lose.play();
+                alert("You destroyed the EARTH :( Failed level 2 ...... repeat the level");
+                hits = 0;
+                misses = 6;
+                levelTime = 45;
+
+ 
+       
+
+            }
+        }
+
+        //Attach a keydown event to the window
+        window.addEventListener("keydown", handleKeyDown);
+
+        //Attach a keyup event to the window
+        window.addEventListener("keyup", handleKeyUp);
+
+        //function to handle keydown event
+        function handleKeyDown(e) {
+            //get the code of the key pressed
+            var code = e.keyCode;
+            //check key code
+            if (code == 37) //left arrow key
+            {
+                leftPressed = true;
+            }
+            else if (code == 39) //right arrow key
+            {
+                rightPressed = true;
+            }
+            else if (code == 38) { //check if the bullet is fired space bar
+                bulletFired = true;
+                gunshot1.play();
+            }
+        }//End of handleKeydown Function
+
+        //function to handle keyup event
+        function handleKeyUp(e) {
+            //get the code of the key released
+            var code = e.keyCode;
+            //check key code
+            if (code == 37) //left arrow key
+            {
+                leftPressed = false;
+            }
+            else if (code == 39)//right arrow key
+            {
+                rightPressed = false;
+            }
+        }
+
+        //Game time function
+        function gameTimer() {
+            setTimeout(function () {
+                time += 100; //increment time by 100 ms
+
+                if (time % 1000 == 0) //if one second has passed each second has 1000 ms
+                {
+                    seconds++;
+                    levelTime--;
+                }
+
+                //call the gameTimer function again
+                gameTimer();
+
+
+            }, 100)
+        }//End of gameTime() function
+
+        //start the timer
+        gameTimer();
+
+        //add mouse event to the window
+        window.addEventListener("mousedown", handleMouseDown, false);
+
+        //event hundler for the mousedown event
+
+        function handleMouseDown(mouseEvent) {
+            //get the canvas bounding rectangle
+            var canvasRect = canvas.getBoundingClientRect();
+
+            //get the distance from canvas to left and right of the BW
+            var cLeft = canvasRect.left;
+            var cTop = canvasRect.top;
+
+            //get mouse disance from left and top of the browser
+            var mWX = mouseEvent.clientX;
+            var mWY = mouseEvent.clientY;
+
+            //get the mouse click relative to the canvas
+            var mX = mWX - cLeft;
+            var mY = mWY - cTop;
+
+            //check if the mouse click is a hit
+            if (boy1ClickedOrTouched(mX, mY)) {
+
+                //fire the bullet
+                bulletFired = true;
+
+                //play the shooting sound
+                gunshot1.play();
+
+            }
+
+            if (boy2ClickedOrTouched(mX, mY)) {
+
+                //fire the bullet
+                bullet2Fired = true;
+
+                //play the shooting sound
+                gunshot2.play();
+            }
+        }
+
+        //function to detect if the mouse click is inside the ship
+        function boy1ClickedOrTouched(x, y) {
+
+            var insideX = x >= boyX && x <= (boyX + boyWidth);
+            var insideY = y >= boyY && y <= (boyY + boyHeight);
+
+            return insideX && insideY;
+        }
+
+
+        //Add a touch event to the window object
+        window.addEventListener("touchstart", handleTouch, false)
+
+        //function to handle touch event
+        function handleTouch(touchEvent) {
+
+            //Get canvas bounding rectangle
+            var canvasRect = canvas.getBoundingClientRect();
+
+            //Get the distance from the eft and top of the window
+            var cLeft = canvasRect.left;
+            var cTop = canvasRect.top;
+
+            //get touh distance from left and top of the window
+            var twX = touchEvent.changedTouches[0].clientX;
+            var twY = touchEvent.changedTouches[0].clientY;
+
+            //calculate touch coordinate relative to the canvas
+
+            var tx = twX - cLeft;
+            var ty = twY - cTop;
+
+            //check if the touch is inside the ship
+            if (boy1ClickedOrTouched(tx, ty)) {
+                //fire the buller
+                bulletFired = true;
+
+                //play the shooting sound
+                gunshot1.play();
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

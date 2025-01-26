@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earth Guardians - Two Players</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+           justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url('images/ogBg.png') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            text-align: center;
+        }
+ 
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+ 
+        h1 {
+            font-size: 2.5rem;
+            color: #004d00; /* Dark Green */
+            margin-bottom: 20px;
+        }
+ 
+        .instructions {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            color: #003366; /* Dark Blue */
+            text-align: left;
+        }
+ 
+        .instructions strong {
+            color: #004d00; /* Dark Green */
+        }
+ 
+        ul {
+            list-style-type: disc;
+            margin: 0;
+            padding-left: 20px;
+        }
+ 
+        li {
+            margin-bottom: 10px;
+        }
+ 
+        .controls {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.8); /* Slightly more opaque background */
+            border-radius: 5px;
+        }
+ 
+        .controls p {
+            margin: 10px 0;
+            font-size: 1rem;
+            color: #00509e; /* Deep Blue */
+        }
+ 
+        .start-button {
+            background-color: #004d00; /* Dark Green */
+            color: #fff;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+ 
+        .start-button:hover {
+            background-color: #003300; /* Even Darker Green */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Two Player Mode</h1>
+        <div class="instructions">
+            <p><strong>Mission to Win:</strong> Hit your target number of items to clean up the environment and level up.</p>
+            <p><strong>Watch Out:</strong></p>
+            <ul>
+                <li><strong>Misses:</strong> Run out of misses, and you'll have to repeat the level.</li>
+                <li><strong>Lives:</strong> Lose all your lives, and the entire game resets—start fresh and try again!</li>
+                <li><strong>Time Matters:</strong> Time is ticking! Complete each level before the clock runs out to keep your mission alive.</li>
+            </ul>
+            <div class="controls">
+                <p><strong>Player 1 Controls:</strong> Use the <strong>Left</strong> and <strong>Right Arrow</strong> keys to move, and the <strong>Up Arrow</strong> key to shoot.</p>
+                <p><strong>Player 2 Controls:</strong> Use the <strong>A</strong> and <strong>D</strong> keys to move, and the <strong>W</strong> key to shoot.</p>
+            </div>
+        </div>
+        <a href="earthGuardians.html" class="start-button">Start Game</a>
+    </div>
+</body>
+</html>
+ 
